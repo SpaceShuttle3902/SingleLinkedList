@@ -1,182 +1,165 @@
-#ifndef SINGLE_LINKED_LIST_H
-#define SINGLE_LINKED_LIST_H
+#include "Single_Linked_List.h"
+#include <iostream>
 
-#include <cstddef> // For size_t
-#include <stdexcept> // For exceptions
+// Function to display the menu
+void displayMenu() {
+    std::cout << "\nSingle Linked List Operations Menu:\n";
+    std::cout << "1. Push front\n";
+    std::cout << "2. Push back\n";
+    std::cout << "3. Pop front\n";
+    std::cout << "4. Pop back\n";
+    std::cout << "5. Display front element\n";
+    std::cout << "6. Display back element\n";
+    std::cout << "7. Insert element at index\n";
+    std::cout << "8. Remove element at index\n";
+    std::cout << "9. Display element at index\n";
+    std::cout << "10. Find position of element\n";
+    std::cout << "11. Check if list is empty\n";
+    std::cout << "12. Exit\n";
+    std::cout << "Enter your choice: ";
+}
 
-template <typename Item_Type>
-struct Node {
-    Item_Type data;
-    Node* next;
+int main() {
+    Single_Linked_List<int> list;
+    int choice; // User's menu choice
 
-    // Constructor for easy node creation
-    Node(const Item_Type& item, Node* next_node = nullptr)
-        : data(item), next(next_node) {}
-};
+    do {
+        displayMenu();
+        std::cin >> choice;
 
-template <typename Item_Type>
-class Single_Linked_List {
-private:
-    Node<Item_Type>* head; // Pointer to the head of the list
-    Node<Item_Type>* tail; // Pointer to the tail of the list
-    size_t num_items; // Number of items in the list
-
-public:
-    // Constructor
-    Single_Linked_List() : head(nullptr), tail(nullptr), num_items(0) {}
-
-    // Destructor
-    ~Single_Linked_List() {
-        while (!empty()) {
-            pop_front();
+        switch (choice) {
+        case 1: {
+            // Push an element to the front
+            int value;
+            std::cout << "Enter value to push to front: ";
+            std::cin >> value;
+            list.push_front(value);
+            std::cout << value << " pushed to front of list.\n";
+            break;
         }
-    }
-
-    // Check if list is empty
-    bool empty() const {
-        return head == nullptr;
-    }
-
-    // Push an item to the front
-    void push_front(const Item_Type& item) {
-        Node<Item_Type>* new_node = new Node<Item_Type>(item, head);
-        head = new_node;
-        if (tail == nullptr) tail = head;
-        ++num_items;
-    }
-
-    // Push an item to the back
-    void push_back(const Item_Type& item) {
-        Node<Item_Type>* new_node = new Node<Item_Type>(item);
-        if (tail == nullptr) {
-            head = tail = new_node;
+        case 2: {
+            // Push an element to the back
+            int value;
+            std::cout << "Enter value to push to back: ";
+            std::cin >> value;
+            list.push_back(value);
+            std::cout << value << " pushed to back of list.\n";
+            break;
         }
-        else {
-            tail->next = new_node;
-            tail = new_node;
-        }
-        ++num_items;
-    }
-
-    // Pop an item from the front
-    void pop_front() {
-        if (empty()) {
-            throw std::underflow_error("List is empty.");
-        }
-        Node<Item_Type>* old_head = head;
-        head = head->next;
-        if (head == nullptr) {
-            tail = nullptr;
-        }
-        delete old_head;
-        --num_items;
-    }
-
-    // Pop an item from the back
-    void pop_back() {
-        if (empty()) {
-            throw std::underflow_error("List is empty.");
-        }
-        if (head == tail) {
-            delete head;
-            head = tail = nullptr;
-        }
-        else {
-            Node<Item_Type>* current = head;
-            while (current->next != tail) {
-                current = current->next;
+        case 3: {
+            // Pop an element from the front
+            try {
+                list.pop_front();
+                std::cout << "Front element popped from list.\n";
             }
-            current->next = nullptr;
-            delete tail;
-            tail = current;
-        }
-        --num_items;
-    }
-
-    // Return the item at the front of the list
-    Item_Type front() const {
-        if (empty()) {
-            throw std::underflow_error("List is empty.");
-        }
-        return head->data;
-    }
-
-    // Return the item at the back of the list
-    Item_Type back() const {
-        if (empty()) {
-            throw std::underflow_error("List is empty.");
-        }
-        return tail->data;
-    }
-
-    // Insert an item at a specific index
-    void insert(size_t index, const Item_Type& item) {
-        if (index == 0) {
-            push_front(item);
-        }
-        else if (index >= num_items) {
-            push_back(item);
-        }
-        else {
-            Node<Item_Type>* current = head;
-            for (size_t i = 0; i < index - 1; ++i) {
-                current = current->next;
+            catch (const std::exception& e) {
+                std::cout << "Error: " << e.what() << std::endl;
             }
-            Node<Item_Type>* new_node = new Node<Item_Type>(item, current->next);
-            current->next = new_node;
-            ++num_items;
+            break;
         }
-    }
-
-    // Remove an item at a specific index
-    bool remove(size_t index) {
-        if (index >= num_items) {
-            return false;
-        }
-        if (index == 0) {
-            pop_front();
-        }
-        else {
-            Node<Item_Type>* current = head;
-            for (size_t i = 0; i < index - 1; ++i) {
-                current = current->next;
+        case 4: {
+            // Pop an element from the back
+            try {
+                list.pop_back();
+                std::cout << "Back element popped from list.\n";
             }
-            Node<Item_Type>* to_delete = current->next;
-            current->next = to_delete->next;
-            if (to_delete == tail) {
-                tail = current;
+            catch (const std::exception& e) {
+                std::cout << "Error: " << e.what() << std::endl;
             }
-            delete to_delete;
-            --num_items;
+            break;
         }
-        return true;
-    }
-
-    // Find the position of the first occurrence of an item
-    size_t find(const Item_Type& item) const {
-        Node<Item_Type>* current = head;
-        size_t index = 0;
-        while (current != nullptr) {
-            if (current->data == item) {
-                return index;
+        case 5: {
+            // Display the front element
+            try {
+                std::cout << "Front element: " << list.front() << std::endl;
             }
-            current = current->next;
-            ++index;
+            catch (const std::exception& e) {
+                std::cout << "Error: " << e.what() << std::endl;
+            }
+            break;
         }
-        return num_items; // If not found, return the size of the list
-    }
+        case 6: {
+            // Display the back element
+            try {
+                std::cout << "Back element: " << list.back() << std::endl;
+            }
+            catch (const std::exception& e) {
+                std::cout << "Error: " << e.what() << std::endl;
+            }
+            break;
+        }
+        case 7: {
+            // Insert an element at a specific index
+            int value, index;
+            std::cout << "Enter index to insert at: ";
+            std::cin >> index;
+            std::cout << "Enter value to insert: ";
+            std::cin >> value;
+            list.insert(index, value);
+            std::cout << value << " inserted at index " << index << ".\n";
+            break;
+        }
+        case 8: {
+            // Remove an element at a specific index
+            int index;
+            std::cout << "Enter index to remove element from: ";
+            std::cin >> index;
+            if (list.remove(index)) {
+                std::cout << "Element at index " << index << " removed.\n";
+            }
+            else {
+                std::cout << "Invalid index. Unable to remove element.\n";
+            }
+            break;
+        }
+        case 9: {
+            // Display element at a specific index
+            int index;
+            std::cout << "Enter index to display: ";
+            std::cin >> index;
+            try {
+                std::cout << "Element at index " << index << ": " << list.get_element_at(index) << std::endl;
+            }
+            catch (const std::exception& e) {
+                std::cout << "Error: " << e.what() << std::endl;
+            }
+            break;
+        }
+        case 10: {
+            // Find the position of a specific element
+            int value;
+            std::cout << "Enter value to find: ";
+            std::cin >> value;
+            size_t pos = list.find(value);
 
-    // Get the element at a specific index
-    Item_Type get_element_at(size_t index) const {
-        if (index >= num_items) {
-            throw std::out_of_range("Index is out of range.");
+            // No size method; display based on validity of pos
+            if (pos != list.find(value)) { // Check if pos is valid
+                std::cout << "Element " << value << " found at index " << pos << ".\n";
+            }
+            else {
+                std::cout << "Element " << value << " not found in list.\n";
+            }
+            break;
         }
-        Node<Item_Type>* current = head;
-        for (size_t i = 0; i < index; ++i) {
-            current = current->next;
+        case 11: {
+            // Check if the list is empty
+            if (list.empty()) {
+                std::cout << "The list is empty.\n";
+            }
+            else {
+                std::cout << "The list is not empty.\n";
+            }
+            break;
         }
-        return current->data;
-    }
-};
+        case 12: {
+            // Exit the program
+            std::cout << "Exiting program.\n";
+            break;
+        }
+        default:
+            std::cout << "Invalid choice. Please try again.\n";
+        }
+    } while (choice != 12);
 
-#endif
+    return 0;
+}
